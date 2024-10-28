@@ -1,6 +1,10 @@
 import logging
 from contextlib import contextmanager
 import pyodbc
+import pymssql
+
+
+
 
 from odoo import _, api, fields, models, tools
 from odoo.exceptions import ValidationError
@@ -9,7 +13,6 @@ _logger = logging.getLogger(__name__)
 
 # this is need otherwise pyodbc will not work correctly
 pyodbc.setDecimalSeparator(".")
-
 
 class BaseExternalMssql(models.Model):
     _name = 'base.external.mssql'
@@ -22,11 +25,16 @@ class BaseExternalMssql(models.Model):
     password = fields.Char("Database Password", required=True)
     connection_string = fields.Text(readonly=True, compute="_compute_connection_string")
     priority = fields.Boolean(string='Use this DB')
+    driver = fields.Selection([('pyodbc', 'pyodbc'), ('pymssql', 'pymssql')], default='pymssql')
     
     @api.depends("server", "database", "username", "password")
     def _compute_connection_string(self):
         for record in self:
-            conn_string = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={record.server};DATABASE={record.database};UID={record.username};PWD={record.password};TrustServerCertificate=yes;'
+            if record.driver == 'pyodbc':
+                conn_string = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={record.server};DATABASE={record.database};UID={record.username};PWD={record.password};TrustServerCertificate=yes;'
+            elif record.driver == 'pymssql':
+                conn_string = f'server="{record.server}", user="{record.username}", password="{record.password}", database="{record.database}", tds_version="7.0"'
+                
             record.connection_string = conn_string
 
     
@@ -34,7 +42,10 @@ class BaseExternalMssql(models.Model):
     def connection_open(self):
         """It provides a context manager for the data source."""
         try:
-            connection = pyodbc.connect(self.connection_string, autocommit=True)
+            if self.driver == 'pyodbc':
+                connection = pyodbc.connect(self.connection_string, autocommit=True)
+            elif self.driver == 'pymssql':
+                connection = pymssql.connect(server=self.server, user=self.username, password=self.password, database=self.database, tds_version="7.0", autocommit=True)
             yield connection
         finally:
             try:
@@ -45,23 +56,29 @@ class BaseExternalMssql(models.Model):
     def connection_close(self, connection):
         return connection.close()
 
-    def execute(self, query_type, query, *params):
+    def execute(self, query_type, query, *params, as_dict=True):
         # import pdb; pdb.set_trace()
         with self.connection_open() as connection:
-            cur = connection.cursor()
-            
+            if not as_dict:
+                cur = connection.cursor()
+            else:
+                cur = connection.cursor(as_dict=True)
             cur.execute(query)
             if query_type == 'insert':
-                connection.commit()
-                res = cur.execute('SELECT SCOPE_IDENTITY() AS [SCOPE_IDENTITY];')
-                last_id = res.fetchval()
+                # connection.commit() not needed for pymssql
+                #res = cur.execute('SELECT SCOPE_IDENTITY() AS [SCOPE_IDENTITY];') # this works for pyodbc
+                #last_id = res.fetchval() # this works for pyodbc
+                last_id = cur.lastrowid
                 return last_id
             elif query_type == 'select':
                 rows = cur.fetchall()
                 return rows
 
             elif query_type == 'select_one':
-                result = cur.fetchval()
+                # result = cur.fetchval()
+                # result = cur.fetchone()[0]
+                result = cur.fetchone()
+                _logger.info('RESULT FROM SELECT ONE: %s' % (result,))
                 connection.commit()
                 return result
 
@@ -81,7 +98,7 @@ class BaseExternalMssql(models.Model):
                 % tools.ustr(e)
             )
         else:
-            rows = self.execute('select', 'SELECT @@VERSION')
+            rows = self.execute('select', 'SELECT @@VERSION', as_dict=False)
             message = "Datenbbank-Version:\n"
             for row in rows:
                 message += f"{row[0]} \n"

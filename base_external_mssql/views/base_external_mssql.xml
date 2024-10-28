@@ -11,6 +11,7 @@
                 <field name="name" />
                 <field name="server" />
                 <field name="database" />
+                <field name="driver" />
             </tree>
         </field>
     </record>
@@ -27,6 +28,7 @@
                         <group>
                             <field name="name" />
                             <field name="server" />
+                            <field name="driver" />
                         </group>
                     </group>
                     <group col="1">
