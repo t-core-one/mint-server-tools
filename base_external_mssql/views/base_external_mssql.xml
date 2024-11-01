@@ -21,7 +21,12 @@
         <field name="arch" type="xml">
             <form>
             <header>
-                    <button name="set_priority" type="object" string="Use this DB" class="btn-primary"/>
+                    <button
+                        name="set_priority"
+                        type="object"
+                        string="Use this DB"
+                        class="btn-primary"
+                    />
                 </header>
                 <sheet>
                     <group>
