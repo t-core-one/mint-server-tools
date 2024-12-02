@@ -1,9 +1,8 @@
-import datetime
 import logging
+from ast import literal_eval
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
-from ast import literal_eval
 
 _logger = logging.getLogger(__name__)
 

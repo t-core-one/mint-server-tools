@@ -4,7 +4,7 @@ Collection of Odoo apps to improve technical features.
 
 ## Usage
 
-Clone module into Odoo addon directory.
+Clone this repo into the Odoo addons directory.
 
 ```bash
 git clone git@github.com:mint-system/odoo-apps-server-tools.git ./addons/server_tools
