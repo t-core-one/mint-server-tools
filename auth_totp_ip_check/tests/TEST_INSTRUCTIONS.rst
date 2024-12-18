@@ -1,0 +1,7 @@
+- Enable 2FA authtentication
+- Paste the secret key to https://totp.danhersam.com/
+- Logout and login with current user
+- Check if TOTP is prompted and enter code
+- Create an entry "127.0.0.1" in "Disable TOTP Check"
+- Logout and login with current user
+- Ensure that TOTP is not prompted
