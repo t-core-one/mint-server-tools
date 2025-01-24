@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<odoo>
+    <!-- DBSource -->
+    <record model="ir.ui.view" id="view_mssql_tree">
+        <field name="name">base.external.mssql.tree</field>
+        <field name="model">base.external.mssql</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="priority" />
+                <field name="name" />
+                <field name="server" />
+                <field name="database" />
+                <field name="driver" />
+            </list>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_mssql_form">
+        <field name="name">base.external.mssql.form</field>
+        <field name="model">base.external.mssql</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button
+                        name="set_priority"
+                        type="object"
+                        string="Use this DB"
+                        class="btn-primary"
+                    />
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="server" />
+                            <field name="driver" />
+                        </group>
+                    </group>
+                    <group col="1">
+                        <group>
+                            <field name="database" />
+                            <field name="username" />
+                            <field name="password" password="True" />
+                        </group>
+                        <group col="1">
+                            <button
+                                name="connection_test"
+                                string="Test connection"
+                                type="object"
+                                icon="fa-refresh"
+                            />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="action_mssql">
+        <field name="name">External Databases</field>
+        <field name="res_model">base.external.mssql</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_mssql_tree" />
+    </record>
+    <menuitem
+        name="Ext. Databases"
+        id="menu_mssql"
+        parent="base.next_id_9"
+        action="action_mssql"
+    />
+</odoo>
