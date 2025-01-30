@@ -10,10 +10,10 @@ class FetchmailServer(models.Model):
 
     database_filter = fields.Char()
 
-    def fetch_mail(self):
+    def fetch_mail(self, raise_exception=True):
         """Apply database filter"""
         db_name = self._cr.dbname
         server = self.filtered(
             lambda s: not s.database_filter or (db_name in s.database_filter.split(","))
         )
-        return super(FetchmailServer, server).fetch_mail()
+        return super(FetchmailServer, server).fetch_mail(raise_exception)
