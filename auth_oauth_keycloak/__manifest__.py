@@ -3,7 +3,7 @@
     "summary": """
         Enables Keycloack integration for the OAuth2 Authentication module.
     """,
-    "author": "Mint System, Odoo Community Association (OCA)",
+    "author": "Mint System",
     "website": "https://www.mint-system.ch",
     "license": "AGPL-3",
     "category": "Technical Settings",

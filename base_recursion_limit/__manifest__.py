@@ -3,7 +3,7 @@
     "summary": """
         Set python recursion limit.
     """,
-    "author": "Mint System, Odoo Community Association (OCA)",
+    "author": "Mint System",
     "website": "https://www.mint-system.ch",
     "license": "AGPL-3",
     "category": "Technical Settings",
